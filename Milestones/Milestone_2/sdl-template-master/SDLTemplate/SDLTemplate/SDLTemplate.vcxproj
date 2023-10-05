@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AltBullet.cpp" />
+    <ClCompile Include="AltBullet2.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -33,6 +35,8 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AltBullet.h" />
+    <ClInclude Include="AltBullet2.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="common.h" />

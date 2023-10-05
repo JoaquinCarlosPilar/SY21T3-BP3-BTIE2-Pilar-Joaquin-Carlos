@@ -1,4 +1,4 @@
-// Milestone_1.cpp : This file contains the 'main' function.
+// Milestone_2.cpp : This file contains the 'main' function.
 
 #include "main.h"
 

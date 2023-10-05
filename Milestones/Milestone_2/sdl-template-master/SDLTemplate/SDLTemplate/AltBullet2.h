@@ -5,12 +5,12 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-class Bullet : public GameObject
+class AltBullet2 : public GameObject
 {
 public:
 
     // This is a constructor where we can specify the location, direction, and speed of the bullets
-    Bullet(float positionX, float positionY, float directionX, float directionY, float speed);
+    AltBullet2(float positionX, float positionY, float directionX, float directionY, float speed);
 
     void start();
     void update();

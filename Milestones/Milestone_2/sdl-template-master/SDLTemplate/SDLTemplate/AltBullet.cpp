@@ -1,8 +1,8 @@
-#include "Bullet.h"
+#include "AltBullet.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-Bullet::Bullet(float positionX, float positionY, float directionX, float directionY, float speed)
+AltBullet::AltBullet(float positionX, float positionY, float directionX, float directionY, float speed)
 {
 	this->x = positionX;
 	this->y = positionY;
@@ -13,7 +13,7 @@ Bullet::Bullet(float positionX, float positionY, float directionX, float directi
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Bullet::start()
+void AltBullet::start()
 {
 	// This initializes values to remove garbage values
 	width = 0;
@@ -22,12 +22,11 @@ void Bullet::start()
 
 	//This sets the width and height properties of the bullet
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Bullet::update()
+void AltBullet::update()
 {
 	// This moves the bullets
 	// X axis
@@ -39,35 +38,35 @@ void Bullet::update()
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Bullet::draw()
+void AltBullet::draw()
 {
 	blit(texture, x, y);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-float Bullet::getPostitionX()
+float AltBullet::getPostitionX()
 {
 	return x;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-float Bullet::getPositionY()
+float AltBullet::getPositionY()
 {
 	return y;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-float Bullet::getWidth()
+float AltBullet::getWidth()
 {
 	return width;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-float Bullet::getHeight()
+float AltBullet::getHeight()
 {
 	return height;
 }

@@ -5,43 +5,52 @@
 #include "SoundManager.h"
 #include "Bullet.h"
 #include <vector>
+#include "util.h"
+#include "Player.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-class Player : public GameObject
+class Boss :
+	public GameObject
 {
 public:
-	~Player();
+	Boss();
+	~Boss();
+
 	void start();
 	void update();
 	void draw();
+	void setPosition(int xPos, int yPos);
 
+	int getHP();
+	int getDamage(int damage);
 	int getPositionX();
 	int getPositionY();
 	int getWidth();
 	int getHeight();
-	int getAddBullet(int bulletnum);
 
-	bool getIsAlive();
-	void doDeath();
-
-	// This tracks the position of the spaceship 
 private:
 	SDL_Texture* texture;
 	Mix_Chunk* sound;
+	Player* playerTarget;
 
 	int x;
 	int y;
+	int hp;
+	int damage;
+
+	float directionX;
+	float directionY;
+
 	int width;
 	int height;
 	int speed;
+	int bulletSpawned;
 
 	float reloadTime;
 	float currentReloadTime;
-
-	int addBullet;
+	float directionChangeTime;
+	float currentDirectionChangeTime;
 
 	std::vector<Bullet*> bullets;
-
-	bool isAlive;
 };

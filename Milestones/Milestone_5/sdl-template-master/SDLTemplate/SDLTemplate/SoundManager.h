@@ -26,7 +26,7 @@ public:
 	static void playSound(const char* filename, int channel = -1);
 	static void playSound(Mix_Chunk* sound, int channel = -1);
 	static void loadMusic(const char* filename);
-	static void playMusic(int loop);
+	static void playMusic(int loop);\
 
 private:
 	std::vector<SoundClip> loadedSounds;

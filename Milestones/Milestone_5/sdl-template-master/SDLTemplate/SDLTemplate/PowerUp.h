@@ -10,32 +10,35 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-class PowerUp : public GameObject
+class Powerup : public GameObject
 {
 public:
-	PowerUp();
-	~PowerUp();
+	Powerup();
+	~Powerup();
 
 	void start();
 	void update();
 	void draw();
-	void setPositionUp(int xPos, int yPos);
 
+	int getPositionX();
+	int getPositionY();
+	int getWidth();
+	int getHeight();
+
+	void setPosition(int xPos, int yPos);
 
 private:
 	SDL_Texture* texture;
 	Mix_Chunk* sound;
+
 	int x;
 	int y;
+	int xPos;
+	int yPos;
+	int width;
+	int height;
+	int speed;
 
 	float directionX;
 	float directionY;
-
-	int width;
-	int height;
-
-	int powerupSpeed;
-	float currentReloadTime;
-	float directionChangeTime;
-	float currentDirectionChangeTime;
 };

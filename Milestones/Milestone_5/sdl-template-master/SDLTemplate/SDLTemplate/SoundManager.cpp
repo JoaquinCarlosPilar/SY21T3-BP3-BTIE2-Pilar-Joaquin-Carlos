@@ -11,14 +11,14 @@ SoundManager::SoundManager()
 
 SoundManager::~SoundManager()
 {
-	
+
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 SoundManager* SoundManager::getInstance()
 {
-	static SoundManager *soundManager = new SoundManager();
+	static SoundManager* soundManager = new SoundManager();
 	return soundManager;
 }
 

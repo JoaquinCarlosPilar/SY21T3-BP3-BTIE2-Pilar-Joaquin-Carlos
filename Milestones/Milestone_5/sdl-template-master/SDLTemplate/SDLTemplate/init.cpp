@@ -12,7 +12,7 @@ void initSDL(void)
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		std::cout << "Couldn't initialize SDL: %s\n" <<  SDL_GetError();
+		std::cout << "Couldn't initialize SDL: %s\n" << SDL_GetError();
 		exit(1);
 	}
 

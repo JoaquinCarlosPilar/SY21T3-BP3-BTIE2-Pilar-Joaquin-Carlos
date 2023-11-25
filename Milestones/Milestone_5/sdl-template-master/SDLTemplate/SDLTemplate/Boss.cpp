@@ -1,77 +1,98 @@
-#include "Enemy.h"
+#include "Boss.h"
 #include "Scene.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-Enemy::Enemy()
+Boss::Boss()
 {
 
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-Enemy::~Enemy()
+Boss::~Boss()
 {
 
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Enemy::start()
+void Boss::start()
 {
 	// Load texture
-	texture = loadTexture("gfx/Alternate_Enemy.png");
+	texture = loadTexture("gfx/Alternate_Boss.png");
 
 	// Initialize variables
-	directionX = 0;
-	directionY = 1;
+	hp = 1000;
+	directionX = -1;
+	directionY = 0;
 	width = 0;
 	height = 0;
 	speed = 2;
-	reloadTime = 60; // reload time of 60 frames
-	currentReloadTime = 0;
-	directionChangeTime = (rand() % 60) + 180; // Direction change time of 3-8 seconds
-	currentDirectionChangeTime = 0;
 
-	// Query texture to set width and height
+	reloadTime = 20; 
+	directionChangeTime = (rand() % 50) + 50; 
+	currentDirectionChangeTime = 0;
+	bulletSpawned = 0;
+
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
 	sound = SoundManager::loadSound("sound/334227__jradcoolness__laser.ogg");
-	sound->volume = 64;
+	sound->volume = 50;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Enemy::update()
+void Boss::update()
 {
 	x += directionX * speed;
-	y += directionY * speed;
 
 	if (currentDirectionChangeTime > 0)
-		directionY = -directionY;
-	currentDirectionChangeTime--;
+	{
+		currentDirectionChangeTime--;
+	}
 
 	if (currentDirectionChangeTime == 0)
 	{
-		directionY = -directionY;
+		directionX = -directionX;
 		currentDirectionChangeTime = directionChangeTime;
 	}
 
 	if (currentReloadTime > 0)
-		currentReloadTime--;
-
-	if (currentReloadTime == 0)
 	{
-		float dx = -1;
-		float dy = 0;
+		currentReloadTime--;
+		bulletSpawned = 0;
+	}
 
-		calcSlope(playerTarget->getPositionX(), playerTarget->getPositionY(), x, y, &dx, &dy);
+	if (currentReloadTime == 0 && bulletSpawned == 0)
+	{
+		bulletSpawned = 1;
+		float dx = 0;
+		float dy = 1;
 
 		SoundManager::playSound(sound);
-		Bullet* bullet = new Bullet(x + 26, y - 2 + height / 2, dx, dy, 7, Side::ENEMY_SIDE);
+		Bullet* bullet = new Bullet(x - 3.5 + width, y - 2 + height / 2, dx, dy, 5, Side::ENEMY_SIDE);
 		bullets.push_back(bullet);
 		getScene()->addGameObject(bullet);
 
-		// After firing, reset our reload timer
+		Bullet* bullet1 = new Bullet(x + 30 + width, y - 2 + height / 2, dx, dy, 5, Side::ENEMY_SIDE);
+		bullets.push_back(bullet1);
+		getScene()->addGameObject(bullet1);
+
+		Bullet* bullet2 = new Bullet(x - 300 + width, y - 2 + height / 2, dx, dy, 5, Side::ENEMY_SIDE);
+		bullets.push_back(bullet2);
+		getScene()->addGameObject(bullet2);
+
+		Bullet* bullet3 = new Bullet(x - 337.5 + width, y - 2 + height / 2, dx, dy, 5, Side::ENEMY_SIDE);
+		bullets.push_back(bullet3);
+		getScene()->addGameObject(bullet3);
+
+		Bullet* bullet4 = new Bullet(x - 70 + width, y - 2 + height / 2, dx, dy, 5, Side::ENEMY_SIDE);
+		bullets.push_back(bullet4);
+		getScene()->addGameObject(bullet4);
+
+		Bullet* bullet5 = new Bullet(x - 200 + width, y - 2 + height / 2, dx, dy, 5, Side::ENEMY_SIDE);
+		bullets.push_back(bullet5);
+		getScene()->addGameObject(bullet5);
 		currentReloadTime = reloadTime;
 	}
 
@@ -90,50 +111,53 @@ void Enemy::update()
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Enemy::draw()
+void Boss::draw()
 {
 	blit(texture, x, y);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void Enemy::setPlayerTarget(Player* player)
-{
-	playerTarget = player;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-void Enemy::setPosition(int xPos, int yPos)
+void Boss::setPosition(int xPos, int yPos)
 {
 	this->x = xPos;
 	this->y = yPos;
 }
 
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-int Enemy::getPositionX()
+int Boss::getHP()
 {
-	return x;
+	return hp;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+int Boss::getDamage(int damage)
+{
+	hp -= damage;
+	return hp;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int Enemy::getPositionY()
+int Boss::getPositionX()
+{
+	return x;
+}
+
+int Boss::getPositionY()
 {
 	return y;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int Enemy::getWidth()
+int Boss::getWidth()
 {
 	return width;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int Enemy::getHeight()
+int Boss::getHeight()
 {
 	return height;
 }

@@ -9,10 +9,12 @@
 GameScene::GameScene()
 {
 	// Register and add game objects on constructor
-	player = new Player();
+	player = new Player;
 	this->addGameObject(player);
-	points = 0;
 
+	int bossSpawn = 0;
+	int bossCounter = 0;
+	points = 0;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -28,40 +30,32 @@ void GameScene::start()
 {
 	Scene::start();
 	// Initialize any scene logic here
-
+	powerUpSound = SoundManager::loadSound("sound/powerUp.ogg");
 	initFonts();
-	currentSpawnTimer = 180;
-	spawnTime = 150; 
 
-	for (int i = 0; i < 3; i++)
+	currentSpawnTimer = 300;
+
+	// Spawn time of 5 seconds
+	spawnTime = 300; 
+
+	for (int i = 0; i < 5; i++)
 	{
 		spawn();
 	}
-
-	// This spawns the powerup
-	currentUpSpawnTimer = 600;
-	spawnTimeUp = 600; 
-
-	for (int i = 0; i < 1; i++)
-	{
-		spawnUp();
-	}
-
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 void GameScene::draw()
-
 {
 	Scene::draw();
+
 	drawText(110, 20, 173, 216, 230, TEXT_CENTER, "POINTS: %03d", points);
 
 	if (player->getIsAlive() == false)
 	{
 		drawText(SCREEN_WIDTH / 2, 350, 238, 75, 43, TEXT_CENTER, "YOU DIED");
 	}
-
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -69,42 +63,149 @@ void GameScene::draw()
 void GameScene::update()
 {
 	Scene::update();
-	doCheckSpawn();
-	doCheckCollision();
+	doSpawnLogic();
+	doCollisionLogic();
+	doPowerupCollision();
+	dobossCollision();
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void GameScene::doSpawnLogic()
+{
+	if (currentSpawnTimer > 0)
+		currentSpawnTimer--;
+
+	if (bossCounter <= 9 && currentSpawnTimer <= 0)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			spawn();
+		}
+		spawnPowerup();
+		currentSpawnTimer = spawnTime;
+	}
+	else if (currentSpawnTimer == 0 && bossCounter > 9 && bossSpawn == 0)
+	{
+		bossSpawns();
+		currentSpawnTimer = 0;
+	}
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void GameScene::doCollisionLogic()
+{
+	// Check for collision
+	for (int i = 0; i < objects.size(); i++)
+	{
+		// Cast to bullet
+		Bullet* bullet = dynamic_cast<Bullet*>(objects[i]);
+		
+		if (bullet != NULL)
+		{
+			if (bullet->getSide() == Side::ENEMY_SIDE)
+			{
+				int collision = checkCollision(
+					player->getPositionX(), player->getPositionY(), player->getWidth(), player->getHeight(),
+					bullet->getPositionX(), bullet->getPositionY(), bullet->getWidth(), bullet->getHeight()
+				);
+
+				if (collision == 1)
+				{
+					player->doDeath();
+					break;
+				}
+			}
+			// If the bullet is from the player side, check against ALL enemies
+			else if (bullet->getSide() == Side::PLAYER_SIDE)
+			{
+				for (int i = 0; i < spawnedEnemies.size(); i++)
+				{
+					Enemy* currentEnemy = spawnedEnemies[i];
+
+					int collision = checkCollision(
+						currentEnemy->getPositionX(), currentEnemy->getPositionY(), currentEnemy->getWidth(), currentEnemy->getHeight(),
+						bullet->getPositionX(), bullet->getPositionY(), bullet->getWidth(), bullet->getHeight()
+					);
+
+					if (collision == 1)
+					{
+						despawnEnemy(currentEnemy);
+						// Increment points
+						points++;
+						bossCounter++;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < spawnedEnemies.size(); i++)
+	{
+		Enemy* currentEnemy = spawnedEnemies[i];
+		if (currentEnemy->getPositionY() > SCREEN_HEIGHT - 20)
+		{
+			despawnEnemy(currentEnemy);
+			break;
+		}
+	}
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void GameScene::doPowerupCollision()
+{
+	for (int i = 0; i < objects.size(); i++)
+	{
+		Powerup* powerup = dynamic_cast<Powerup*>(objects[i]);
+		if (powerup != NULL)
+		{
+			int collision = checkCollision(
+				player->getPositionX(), player->getPositionY(), player->getWidth(), player->getHeight(),
+				powerup->getPositionX(), powerup->getPositionY(), powerup->getWidth(), powerup->getHeight()
+			);
+			for (int i = 0; i < spawnedPowerups.size(); i++)
+			{
+				Powerup* currentPowerup = spawnedPowerups[i];
+				if (collision == 1)
+				{
+					SoundManager::playSound(powerUpSound);
+					player->getAddBullet(1);
+					despawnPowerup(currentPowerup);
+					break;
+				}
+			}
+		}
+	}
+	for (int i = 0; i < spawnedPowerups.size(); i++)
+	{
+		Powerup* currentPowerup = spawnedPowerups[i];
+		if (currentPowerup->getPositionY() > SCREEN_HEIGHT - 20)
+		{
+			despawnPowerup(currentPowerup);
+			break;
+		}
+	}
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 void GameScene::spawn()
 {
-	//ENEMY SPAWN
 	Enemy* enemy = new Enemy();
 	this->addGameObject(enemy);
 	enemy->setPlayerTarget(player);
 
-	enemy->setPosition(50, -500 + (rand() % 300));
+	enemy->setPosition(100 + rand() % 400, -200 + rand() % 200);
 	spawnedEnemies.push_back(enemy);
-
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-void GameScene::spawnUp()
-{
-
-	// SPAWN LOGIC FOR POWERUPS ONLY
-	PowerUp* powerup = new PowerUp();
-	this->addGameObject(powerup);
-
-	powerup->setPositionUp(-5, -1500 + (rand() % 300));
-	spawnedUps.push_back(powerup);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 void GameScene::despawnEnemy(Enemy* enemy)
 {
-	int index = -1;
+	int index = 0;
 	for (int i = 0; i < spawnedEnemies.size(); i++)
 	{
 		// If the pointer matches
@@ -114,32 +215,71 @@ void GameScene::despawnEnemy(Enemy* enemy)
 			break;
 		}
 	}
-	// if any match is found
+
+	// If any match is found
 	if (index != -1)
 	{
 		spawnedEnemies.erase(spawnedEnemies.begin() + index);
 		delete enemy;
-		texture = loadTexture("gfx/explosion.png");
-		blit(texture, x, y);
-		SoundManager::playSound(sound);
 	}
-
-
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void GameScene::doCheckCollision()
+void GameScene::spawnPowerup()
 {
-	// Checks for Collision
+	Powerup* powerup = new Powerup();
+	this->addGameObject(powerup);
+
+	powerup->setPosition(100 + rand() % 400, -200 + rand() % 200);
+	spawnedPowerups.push_back(powerup);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void GameScene::despawnPowerup(Powerup* powerup)
+{
+	int index = 0;
+	for (int i = 0; i < spawnedPowerups.size(); i++)
+	{
+		if (powerup == spawnedPowerups[i])
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index != -1)
+	{
+		spawnedPowerups.erase(spawnedPowerups.begin() + index);
+		delete powerup;
+	}
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void GameScene::bossSpawns()
+{
+	Boss* boss = new Boss();
+	this->addGameObject(boss);
+
+	boss->setPosition(200, 1);
+	spawnedBoss.push_back(boss);
+	bossSpawn++;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void GameScene::dobossCollision()
+{
 	for (int i = 0; i < objects.size(); i++)
 	{
-		//Case to bullet 
+		// Cast to bullet
 		Bullet* bullet = dynamic_cast<Bullet*>(objects[i]);
-		// Check if the cast was successful (i.e objects [i] is a Bullet)
+
+
 		if (bullet != NULL)
 		{
-			// If the bullet is the enemy side, check against the player
+		
 			if (bullet->getSide() == Side::ENEMY_SIDE)
 			{
 				int collision = checkCollision(
@@ -154,23 +294,27 @@ void GameScene::doCheckCollision()
 				}
 			}
 
-			// If the bullet is the player side, check against ALL Enemies
 			else if (bullet->getSide() == Side::PLAYER_SIDE)
 			{
-				for (int i = 0; i < spawnedEnemies.size(); i++)
+				for (int i = 0; i < spawnedBoss.size(); i++)
 				{
-					Enemy* currentEnemy = spawnedEnemies[i];
+					Boss* currentBoss = spawnedBoss[i];
+
 					int collision = checkCollision(
-						currentEnemy->getPositionX(), currentEnemy->getPositionY(), currentEnemy->getWidth(), currentEnemy->getHeight(),
+						currentBoss->getPositionX(), currentBoss->getPositionY(), currentBoss->getWidth(), currentBoss->getHeight(),
 						bullet->getPositionX(), bullet->getPositionY(), bullet->getWidth(), bullet->getHeight()
 					);
 
-					if (collision == 1)
+					if ((currentBoss->getHP() > 0) && (collision == 1))
 					{
-						//despawn one at the time (might crash)
-						despawnEnemy(currentEnemy);
-						//increment points
-						points++;
+						currentBoss->getDamage(1);
+						break;
+					}
+					else if (currentBoss->getHP() <= 0 && collision == 1)
+					{
+						bossCounter = 0;
+						despawnBoss(currentBoss);
+						points += 5;
 						break;
 					}
 				}
@@ -181,32 +325,22 @@ void GameScene::doCheckCollision()
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-
-void GameScene::doCheckSpawn()
+void GameScene::despawnBoss(Boss* boss)
 {
-	// FOR ENEMY SPAWN (3 SPAWN PER WAVE)
-	if (currentSpawnTimer > 0)
-		currentSpawnTimer--;
-
-	if (currentSpawnTimer <= 0)
+	int index = 0;
+	bossSpawn = 0;
+	currentSpawnTimer = spawnTime;
+	for (int i = 0; i < spawnedBoss.size(); i++)
 	{
-		for (int i = 0; i < 3; i++)
+		if (boss == spawnedBoss[i])
 		{
-			spawn();
+			index = i;
+			break;
 		}
-		currentSpawnTimer = spawnTime;
 	}
-
-	// FOR POWER UP SPAWN (ONLY 1 SPAWN)
-	if (currentUpSpawnTimer > 0)
-		currentUpSpawnTimer--;
-
-	if (currentUpSpawnTimer <= 0)
+	if (index != -1)
 	{
-		for (int i = 0; i < 1; i++)
-		{
-			spawnUp();
-		}
-		currentUpSpawnTimer = spawnTimeUp;
+		spawnedBoss.erase(spawnedBoss.begin() + index);
+		delete boss;
 	}
 }

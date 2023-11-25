@@ -4,9 +4,9 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-
 // Modified version of structs.h found in Parallel Realities
-struct Texture {
+struct Texture 
+{
 	char name[MAX_NAME_LENGTH];
 	SDL_Texture* texture;
 	Texture* next;
@@ -14,7 +14,8 @@ struct Texture {
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-typedef struct {
+typedef struct 
+{
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 	int keyboard[MAX_KEYBOARD_KEYS];

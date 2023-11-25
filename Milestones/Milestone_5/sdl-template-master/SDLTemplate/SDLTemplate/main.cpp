@@ -1,5 +1,3 @@
-// Milestone_5.cpp : This file contains the 'main' function.
-
 #include "main.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -25,12 +23,12 @@ int main(int argc, char* argv[])
 	remainder = 0;
 
 	// Initialize GameScene or any first scene you want here
-	GameScene *scene = new GameScene();
-	
+	GameScene* scene = new GameScene();
+
 	// Framework code
 	// Pass in your initialized variable here
 	Scene::setActiveScene(scene);
-	
+
 	// Main game loop
 	while (true)
 	{

@@ -4,9 +4,9 @@
 #include "draw.h"
 #include "SoundManager.h"
 #include "Bullet.h"
-#include "Player.h"
 #include <vector>
 #include "util.h"
+#include "Player.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -37,15 +37,10 @@ private:
 
 	float directionX;
 	float directionY;
-	
+
 	int width;
 	int height;
-	int upspeed;
-	int downspeed;
-	int backwardspeed;
-	int forwardspeed;
-	int bulletspeed;
-	int enemyspeed;
+	int speed;
 
 	float reloadTime;
 	float currentReloadTime;

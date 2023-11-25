@@ -19,26 +19,21 @@ Player::~Player()
 
 void Player::start()
 {
-	// Load Texture
-	texture = loadTexture("gfx/player.png");
+	// Load texture
+	texture = loadTexture("gfx/Alternate_Player.png");
 
-	// Initialize to avoid garbage values
+	// Initialize variables
 	x = 350;
 	y = 650;
 	width = 0;
 	height = 0;
-	upspeed = 6;
-	downspeed = 6;
-	forwardspeed = 6;
-	backwardspeed = 6;
-	bulletspeed = 12;
-	reloadTime = 12;
+	speed = 5;
+	reloadTime = 10; 
 	currentReloadTime = 0;
 	isAlive = true;
 
-	// Query the texture to set our width and height
+	// Query texture to set width and height
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-
 	sound = SoundManager::loadSound("sound/334227__jradcoolness__laser.ogg");
 }
 
@@ -46,66 +41,110 @@ void Player::start()
 
 void Player::update()
 {
-	// Memory manage our bullets. When they go off screen, delete them 
+	// Memory manage our bullets. When they go off screen, delete.
 	for (int i = 0; i < bullets.size(); i++)
 	{
-		if (bullets[i]->getPositionY() > SCREEN_HEIGHT) 
+		if (bullets[i]->getPositionX() > SCREEN_WIDTH)
 		{
 			// This caches the variable so we can delete it later
 			Bullet* bulletToErase = bullets[i];
 			bullets.erase(bullets.begin() + i);
 			delete bulletToErase;
+			break;
 		}
 	}
+
 	if (!isAlive) return;
 
 	if (app.keyboard[SDL_SCANCODE_W])
 	{
-		y -= upspeed;
+		y -= speed;
 	}
 	if (app.keyboard[SDL_SCANCODE_S])
 	{
-		y += downspeed;
+		y += speed;
 	}
 	if (app.keyboard[SDL_SCANCODE_A])
 	{
-		x -= backwardspeed;
+		x -= speed;
 	}
 	if (app.keyboard[SDL_SCANCODE_D])
 	{
-		x += forwardspeed;
+		x += speed;
 	}
 
 	// LSHIFT keybind
 	// This increases the player's speed to 10
 	if (app.keyboard[SDL_SCANCODE_LSHIFT])
 	{
-		forwardspeed = 10;
-		backwardspeed = 10;
-		upspeed = 10;
-		downspeed = 10;
+		speed = 10;
 	}
 
 	// BACKSPACE keybind
 	// This reverts the player's speed to 5
 	if (app.keyboard[SDL_SCANCODE_BACKSPACE])
 	{
-		forwardspeed = 5;
-		backwardspeed = 5;
-		upspeed = 5;
-		downspeed = 5;
+		speed = 5;
 	}
 
-	// Decrement the player's reload timer
+
+	// Decrement the player's reload time
 	if (currentReloadTime > 0)
 		currentReloadTime--;
 
+	// Firing Bullet
 	if (app.keyboard[SDL_SCANCODE_F] && currentReloadTime == 0)
 	{
 		SoundManager::playSound(sound);
-		Bullet* bullet = new Bullet(x + 11, y - 1.5 + height / 2, 0, -2, 7, Side::PLAYER_SIDE);
+		Bullet* bullet = new Bullet(x + 11, y - 22 + height / 2, 0, -2, 7, Side::PLAYER_SIDE);
 		bullets.push_back(bullet);
 		getScene()->addGameObject(bullet);
+
+		if (addBullet == 1)
+		{
+			Bullet* bulletPlus = new Bullet(x + 24, y - 22 + height / 2, 0, -2, 7, Side::PLAYER_SIDE);
+			bullets.push_back(bulletPlus);
+			getScene()->addGameObject(bulletPlus);
+		}
+
+		else if (addBullet >= 2)
+		{
+			Bullet* bulletPlus = new Bullet(x - 30 + width / 2, y - 40 + height, 0, -1, 10, Side::PLAYER_SIDE);
+			bullets.push_back(bulletPlus);
+			getScene()->addGameObject(bulletPlus);
+			Bullet* bulletPlus1 = new Bullet(x + 4 + width / 2, y - 40 + height, 0, -1, 10, Side::PLAYER_SIDE);
+			bullets.push_back(bulletPlus1);
+			getScene()->addGameObject(bulletPlus1);
+		}
+
+		// After firing, reset our reload timer
+		currentReloadTime = reloadTime;
+	}
+
+	// Alternate Firing Bullet
+	if (app.keyboard[SDL_SCANCODE_G] && currentReloadTime == 0)
+	{
+		SoundManager::playSound(sound);
+		Bullet* bullet = new Bullet(x + 11, y - 22 + height / 2, 0, -2, 14, Side::PLAYER_SIDE);
+		bullets.push_back(bullet);
+		getScene()->addGameObject(bullet);
+
+		if (addBullet == 1)
+		{
+			Bullet* bulletPlus = new Bullet(x + 44, y - 22 + height / 2, 0, -2, 14, Side::PLAYER_SIDE);
+			bullets.push_back(bulletPlus);
+			getScene()->addGameObject(bulletPlus);
+		}
+
+		else if (addBullet >= 2)
+		{
+			Bullet* bulletPlus = new Bullet(x - 50 + width / 2, y - 40 + height, 0, -1, 20, Side::PLAYER_SIDE);
+			bullets.push_back(bulletPlus);
+			getScene()->addGameObject(bulletPlus);
+			Bullet* bulletPlus1 = new Bullet(x + 24 + width / 2, y - 40 + height, 0, -1, 20, Side::PLAYER_SIDE);
+			bullets.push_back(bulletPlus1);
+			getScene()->addGameObject(bulletPlus1);
+		}
 
 		// After firing, reset our reload timer
 		currentReloadTime = reloadTime;
@@ -146,6 +185,14 @@ int Player::getWidth()
 int Player::getHeight()
 {
 	return height;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+int Player::getAddBullet(int bulletnum)
+{
+	addBullet = addBullet + bulletnum;
+	return addBullet;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

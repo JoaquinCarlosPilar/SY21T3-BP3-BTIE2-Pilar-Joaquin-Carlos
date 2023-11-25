@@ -1,75 +1,77 @@
-#include "PowerUp.h"
+#include "Powerup.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-PowerUp::PowerUp()
+Powerup::Powerup()
 {
 
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-PowerUp::~PowerUp()
+Powerup::~Powerup()
 {
 
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void PowerUp::start()
+void Powerup::start()
 {
-	// Load Texture
-	texture = loadTexture("gfx/points.png");
-	// Initialize to avoid garbage values
-
-	powerupSpeed = 1;
-	directionX = -4;
-	directionY = 4;
 	width = 0;
 	height = 0;
-	currentReloadTime = 0;
-	directionChangeTime = (rand() % 100) + 100; //Direction Change time of 2.5
-	currentDirectionChangeTime = 0;
+	speed = 3;
+	directionX = 0;
+	directionY = 1;
 
-	// Query the texture to set our width and height
+	texture = loadTexture("gfx/Alternate_Points.png");
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-
-
 }
 
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-void PowerUp::update()
+void Powerup::update()
 {
-
-	x += directionX * powerupSpeed;
-	y += directionY * powerupSpeed;
-
-	if (currentDirectionChangeTime > 0)
-		currentDirectionChangeTime--;
-
-	if (currentDirectionChangeTime == 0)
-	{
-		-directionY == -directionY;
-		directionX = -directionX;
-
-		currentDirectionChangeTime = directionChangeTime;
-	}
-	else
-		- directionY == -directionY;
+	x += directionX * speed;
+	y += directionY * speed;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void PowerUp::draw()
+void Powerup::draw()
 {
 	blit(texture, x, y);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void PowerUp::setPositionUp(int xPos, int yPos)
+int Powerup::getPositionX()
+{
+	return x;
+}
 
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+int Powerup::getPositionY()
+{
+	return y;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+int Powerup::getWidth()
+{
+	return width;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+int Powerup::getHeight()
+{
+	return height;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void Powerup::setPosition(int xPos, int yPos)
 {
 	this->x = xPos;
 	this->y = yPos;

@@ -3,10 +3,10 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "PowerUp.h"
 #include <vector>
 #include "text.h"
-#include "draw.h"
+#include "Powerup.h"
+#include "Boss.h"
 #include "SoundManager.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -22,37 +22,32 @@ public:
 	void update();
 
 private:
-
-	//FOR SDL 
-	SDL_Texture* texture;
-	Mix_Chunk* sound;
-
-	//EQUALS TO NEW CLASS
 	Player* player;
-	PowerUp* powerup;
-
-	// Powerup Spawning Logic
-	float spawnTimeUp;
-	float currentUpSpawnTimer;
-
-	std::vector<PowerUp* > spawnedUps;
+	Enemy* enemy;
+	Powerup* powerup;
+	Boss* boss;
 
 	// Enemy spawning logic
 	float spawnTime;
 	float currentSpawnTimer;
 
-	std::vector<Enemy* > spawnedEnemies;
+	Mix_Chunk* powerUpSound;
+	std::vector<Enemy*> spawnedEnemies;
+	std::vector<Powerup*> spawnedPowerups;
+	std::vector<Boss*> spawnedBoss;
 
-	int x;
-	int y;
-	int width;
-	int height;
-
+	void doSpawnLogic();
+	void doCollisionLogic();
+	void doPowerupCollision();
 	void spawn();
-	void spawnUp();
 	void despawnEnemy(Enemy* enemy);
-	void doCheckCollision();
-	void doCheckSpawn();
+	void spawnPowerup();
+	void despawnPowerup(Powerup* powerup);
+	void bossSpawns();
+	void dobossCollision();
+	void despawnBoss(Boss* boss);
 
+	int bossSpawn;
+	int bossCounter;
 	int points;
 };
